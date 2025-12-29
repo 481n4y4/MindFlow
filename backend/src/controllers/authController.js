@@ -28,28 +28,28 @@ export const register = async (req, res) => {
     }
 }
 
-export const login = async (res, req) => {
-    const {email, password } = req.body
+export const login = async (req, res) => {
+    const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({email})
+        const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({message: "Invalid Credentials"})
+            return res.status(400).json({ message: "Invalid credentials" });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password)
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({message: "Invalid credentails"})
+            return res.status(400).json({ message: "Invalid credentials" });
         }
 
         const token = jwt.sign(
-            {id: user._id},
+            { id: user._id },
             process.env.JWT_SECRET,
-            {expiresIn: "1d"}
-        )
+            { expiresIn: "1d" }
+        );
 
-        res.json({token})
+        res.status(200).json({ token });
     } catch (error) {
-        res.status(500).json({message: error.message})
+        res.status(500).json({ message: error.message });
     }
-}
+};
