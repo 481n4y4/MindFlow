@@ -30,8 +30,8 @@ export default function Login() {
       // simpan token
       localStorage.setItem("token", token);
 
+      navigate("/dashboard");
       alert("Login berhasil");
-      navigate("/dashboard")
     } catch (err) {
       console.error(err);
       setError("Login gagal");
@@ -67,6 +67,16 @@ export default function Login() {
         <button className="w-full rounded bg-blue-600 p-2 text-white">
           Login
         </button>
+
+        <p className="mt-3 text-sm text-center">
+          Belum punya akun?{" "}
+          <span
+            className="cursor-pointer text-blue-600"
+            onClick={() => navigate("/register")}
+          >
+            Register
+          </span>
+        </p>
       </form>
     </div>
   );
