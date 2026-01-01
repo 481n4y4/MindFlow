@@ -1,10 +1,9 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api/auth/login"
+  baseURL: "http://localhost:5000/api",
 });
 
-// nanti JWT disisipkan di sini
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {

@@ -3,19 +3,25 @@ import { useNavigate } from "react-router-dom";
 export default function Dashboard() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const logout = () => {
     localStorage.removeItem("token");
     navigate("/");
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="p-6">
       <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p>Login berhasil 🎉</p>
 
       <button
-        onClick={handleLogout}
-        className="rounded bg-red-600 px-4 py-2 text-white"
+        onClick={() => navigate("/todos")}
+        className="mr-2 mt-4 rounded bg-blue-600 px-4 py-2 text-white"
+      >
+        Todo List
+      </button>
+
+      <button
+        onClick={logout}
+        className="mt-4 rounded bg-red-600 px-4 py-2 text-white"
       >
         Logout
       </button>
