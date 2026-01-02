@@ -1,15 +1,25 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    // Validasi sederhana
+    if (!email || !password) {
+      setError("Email dan password harus diisi");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post(
@@ -27,57 +37,181 @@ export default function Login() {
 
       const token = response.data.token;
 
-      // simpan token
+      // Simpan token
       localStorage.setItem("token", token);
 
+      // Navigasi ke dashboard
       navigate("/dashboard");
-      alert("Login berhasil");
     } catch (err) {
       console.error(err);
-      setError("Login gagal");
+      if (err.response?.status === 401) {
+        setError("Email atau password salah");
+      } else if (err.response?.status === 404) {
+        setError("User tidak ditemukan");
+      } else {
+        setError("Terjadi kesalahan. Silakan coba lagi.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <form
-        onSubmit={handleLogin}
-        className="w-80 rounded-lg bg-white p-6 shadow"
-      >
-        <h2 className="mb-4 text-xl font-bold">Login</h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo dan Branding */}
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-block">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 flex items-center justify-center mr-3">
+                <span className="text-white font-bold text-2xl">MF</span>
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Mind<span className="text-blue-600">Flow</span>
+              </h1>
+            </div>
+          </Link>
+          <h2 className="text-2xl font-bold text-gray-800">Masuk ke Akun Anda</h2>
+          <p className="text-gray-600 mt-2">
+            Masuk untuk mengelola alur kerja dan ide Anda
+          </p>
+        </div>
 
-        {error && <p className="mb-2 text-red-500">{error}</p>}
+        {/* Login Form */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
+          {error && (
+            <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm font-medium">{error}</p>
+            </div>
+          )}
 
-        <input
-          type="email"
-          placeholder="Email"
-          className="mb-3 w-full rounded border p-2"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          <form onSubmit={handleLogin}>
+            {/* Email Input */}
+            <div className="mb-6">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Alamat Email
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="nama@email.com"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="mb-3 w-full rounded border p-2"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+            {/* Password Input */}
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <button
+                  type="button"
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  onClick={() => navigate("/forgot-password")}
+                >
+                  Lupa password?
+                </button>
+              </div>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="Masukkan password"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
 
-        <button className="w-full rounded bg-blue-600 p-2 text-white">
-          Login
-        </button>
+            {/* Remember Me Checkbox */}
+            <div className="flex items-center mb-8">
+              <input
+                id="remember-me"
+                type="checkbox"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                Ingat saya
+              </label>
+            </div>
 
-        <p className="mt-3 text-sm text-center">
-          Belum punya akun?{" "}
-          <span
-            className="cursor-pointer text-blue-600"
-            onClick={() => navigate("/register")}
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`w-full py-3 px-4 rounded-lg font-medium text-white shadow-lg transition-all ${
+                isLoading
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 hover:shadow-xl"
+              }`}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Memproses...
+                </div>
+              ) : (
+                "Masuk"
+              )}
+            </button>
+          </form>
+
+          {/* Register Link */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-600">
+              Belum punya akun?{" "}
+              <Link
+                to="/register"
+                className="text-blue-600 font-semibold hover:text-blue-800 transition-colors"
+              >
+                Daftar sekarang
+              </Link>
+            </p>
+            <p className="mt-4 text-sm text-gray-500">
+              Dengan mendaftar, Anda menyetujui{" "}
+              <a href="#" className="text-blue-600 hover:text-blue-800">Syarat & Ketentuan</a>{" "}
+              dan{" "}
+              <a href="#" className="text-blue-600 hover:text-blue-800">Kebijakan Privasi</a>
+            </p>
+          </div>
+        </div>
+
+        {/* Back to Home */}
+        <div className="mt-8 text-center">
+          <Link
+            to="/"
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
           >
-            Register
-          </span>
-        </p>
-      </form>
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Kembali ke halaman utama
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

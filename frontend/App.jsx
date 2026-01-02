@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Todo from "./pages/Todo";
+import LandingPage from "./pages/Landing";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -13,7 +14,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
         <Route

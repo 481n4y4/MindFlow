@@ -1,16 +1,110 @@
-# React + Vite
+# MindFlow
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+MindFlow adalah sebuah aplikasi berbasis web yang dirancang untuk membantu pengguna dalam mengelola alur kerja (workflow), ide, dan data secara terstruktur. Proyek ini dikembangkan sebagai bagian dari pembelajaran dan implementasi **Full Stack Web Development** dengan fokus pada **Authentication menggunakan JWT** serta **CRUD REST API**.
 
-Currently, two official plugins are available:
+## ✨ Fitur Utama
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+* 🔐 **Autentikasi JWT (JSON Web Token)**
 
-## React Compiler
+  * Register pengguna
+  * Login pengguna
+  * Proteksi route menggunakan token
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* 🗂 **CRUD (Create, Read, Update, Delete)**
 
-## Expanding the ESLint configuration
+  * Manajemen data utama aplikasi (misalnya task / catatan / flow)
+  * Terhubung dengan database MongoDB
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* 🎨 **Frontend Modern**
+
+  * Menggunakan **Tailwind CSS** untuk styling
+  * UI responsif dan bersih
+
+* 🌐 **RESTful API**
+
+  * Backend terpisah dari frontend
+  * Struktur API rapi dan scalable
+
+## 🛠 Teknologi yang Digunakan
+
+### Backend
+
+* Node.js
+* Express.js
+* MongoDB
+* Mongoose
+* JSON Web Token (JWT)
+* bcrypt (hashing password)
+
+### Frontend
+
+* HTML5
+* CSS3
+* JavaScript
+* Tailwind CSS
+* Axios / Fetch API
+
+## 🚀 Cara Menjalankan Project
+
+### 1️⃣ Clone Repository
+
+```bash
+git clone https://github.com/username/MindFlow.git
+cd MindFlow
+```
+
+### 2️⃣ Setup Backend
+
+```bash
+cd backend
+npm install
+```
+
+Buat file `.env`:
+
+```
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+```
+
+Jalankan server:
+
+```bash
+npm run dev
+```
+
+### 3️⃣ Setup Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## 🧪 Testing
+
+* Testing login menggunakan JWT
+* Testing endpoint CRUD menggunakan Postman / Thunder Client
+* Testing integrasi frontend dengan API backend
+
+## 🎯 Tujuan Project
+
+* Memahami konsep **JWT Authentication**
+* Menerapkan **REST API & CRUD**
+* Mengintegrasikan frontend dan backend
+* Menggunakan MongoDB sebagai database NoSQL
+
+## 👤 Developer
+
+**Kheira Abinaya Gavin Lovedila**
+SMK Negeri 7 Semarang
+Bidang Minat: Teknologi Informasi & Web Development
+
+## 📌 Catatan
+
+Project ini dikembangkan untuk keperluan pembelajaran dan tugas praktik. Struktur dan fitur dapat terus dikembangkan sesuai kebutuhan.
+
+---
+
+✨ *MindFlow – Think Clearly, Work Smoothly*

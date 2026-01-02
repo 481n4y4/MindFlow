@@ -1,19 +1,60 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
   const navigate = useNavigate();
+
+  // Fungsi untuk menghitung kekuatan password
+  const calculatePasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    return strength;
+  };
+
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    setPasswordStrength(calculatePasswordStrength(newPassword));
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    // Validasi
+    if (!name || !email || !password || !confirmPassword) {
+      setError("Semua field harus diisi");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Password dan konfirmasi password tidak cocok");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password harus minimal 6 karakter");
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      await axios.post(
+      const response = await axios.post(
         "http://localhost:5000/api/auth/register",
         {
           name,
@@ -27,62 +68,289 @@ export default function Register() {
         }
       );
 
-      alert("Register berhasil, silakan login");
-      navigate("/");
+      // Navigasi ke halaman login dengan pesan sukses
+      navigate("/login", { 
+        state: { 
+          message: "Registrasi berhasil! Silakan login dengan akun Anda." 
+        } 
+      });
     } catch (err) {
       console.error(err);
-      setError("Register gagal");
+      if (err.response?.status === 400) {
+        setError("Email sudah terdaftar");
+      } else if (err.response?.status === 422) {
+        setError("Format data tidak valid");
+      } else {
+        setError("Terjadi kesalahan. Silakan coba lagi.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // Fungsi untuk mendapatkan warna strength meter
+  const getStrengthColor = (strength) => {
+    if (strength <= 1) return "bg-red-500";
+    if (strength <= 3) return "bg-yellow-500";
+    return "bg-green-500";
+  };
+
+  // Fungsi untuk mendapatkan teks strength meter
+  const getStrengthText = (strength) => {
+    if (strength <= 1) return "Sangat Lemah";
+    if (strength <= 2) return "Lemah";
+    if (strength <= 3) return "Cukup";
+    if (strength <= 4) return "Kuat";
+    return "Sangat Kuat";
+  };
+
   return (
-    <div className="flex h-screen items-center justify-center">
-      <form
-        onSubmit={handleRegister}
-        className="w-80 rounded-lg bg-white p-6 shadow"
-      >
-        <h2 className="mb-4 text-xl font-bold">Register</h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo dan Branding */}
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-block">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 flex items-center justify-center mr-3">
+                <span className="text-white font-bold text-2xl">MF</span>
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Mind<span className="text-blue-600">Flow</span>
+              </h1>
+            </div>
+          </Link>
+          <h2 className="text-2xl font-bold text-gray-800">Buat Akun Baru</h2>
+          <p className="text-gray-600 mt-2">
+            Bergabung dengan MindFlow untuk mengelola alur kerja Anda
+          </p>
+        </div>
 
-        {error && <p className="mb-2 text-red-500">{error}</p>}
+        {/* Register Form */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
+          {error && (
+            <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm font-medium">{error}</p>
+            </div>
+          )}
 
-        <input
-          type="text"
-          placeholder="Nama"
-          className="mb-3 w-full rounded border p-2"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+          <form onSubmit={handleRegister}>
+            {/* Nama Input */}
+            <div className="mb-6">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                Nama Lengkap
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="Masukkan nama lengkap"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
 
-        <input
-          type="email"
-          placeholder="Email"
-          className="mb-3 w-full rounded border p-2"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+            {/* Email Input */}
+            <div className="mb-6">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Alamat Email
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="nama@email.com"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="mb-3 w-full rounded border p-2"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+            {/* Password Input */}
+            <div className="mb-6">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="Masukkan password minimal 6 karakter"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              
+              {/* Password Strength Meter */}
+              {password && (
+                <div className="mt-3">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">Kekuatan password:</span>
+                    <span className={`font-medium ${
+                      passwordStrength <= 1 ? "text-red-600" :
+                      passwordStrength <= 3 ? "text-yellow-600" :
+                      "text-green-600"
+                    }`}>
+                      {getStrengthText(passwordStrength)}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full ${getStrengthColor(passwordStrength)} transition-all duration-300`}
+                      style={{ width: `${(passwordStrength / 5) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="mt-2 text-xs text-gray-500">
+                    <p>Password harus mengandung:</p>
+                    <ul className="list-disc list-inside ml-2 mt-1 space-y-1">
+                      <li className={password.length >= 8 ? "text-green-600" : "text-gray-400"}>
+                        Minimal 8 karakter
+                      </li>
+                      <li className={/[A-Z]/.test(password) ? "text-green-600" : "text-gray-400"}>
+                        Huruf kapital
+                      </li>
+                      <li className={/[0-9]/.test(password) ? "text-green-600" : "text-gray-400"}>
+                        Angka
+                      </li>
+                      <li className={/[^A-Za-z0-9]/.test(password) ? "text-green-600" : "text-gray-400"}>
+                        Karakter khusus
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
 
-        <button className="w-full rounded bg-green-600 p-2 text-white">
-          Register
-        </button>
+            {/* Confirm Password Input */}
+            <div className="mb-8">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                Konfirmasi Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Konfirmasi password Anda"
+                  className={`w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                    confirmPassword && password !== confirmPassword
+                      ? "border-red-300"
+                      : "border-gray-300"
+                  }`}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              {confirmPassword && password !== confirmPassword && (
+                <p className="mt-2 text-sm text-red-600">Password tidak cocok</p>
+              )}
+            </div>
 
-        <p className="mt-3 text-sm text-center">
-          Sudah punya akun?{" "}
-          <span
-            className="cursor-pointer text-blue-600"
-            onClick={() => navigate("/")}
+            {/* Terms Checkbox */}
+            <div className="flex items-start mb-8">
+              <input
+                id="terms"
+                type="checkbox"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+                required
+              />
+              <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
+                Saya menyetujui{" "}
+                <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">
+                  Syarat & Ketentuan
+                </a>{" "}
+                dan{" "}
+                <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">
+                  Kebijakan Privasi
+                </a>{" "}
+                MindFlow
+              </label>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`w-full py-3 px-4 rounded-lg font-medium text-white shadow-lg transition-all ${
+                isLoading
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-green-600 to-green-800 hover:from-green-700 hover:to-green-900 hover:shadow-xl"
+              }`}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Membuat Akun...
+                </div>
+              ) : (
+                "Daftar Sekarang"
+              )}
+            </button>
+          </form>
+
+          {/* Login Link */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-600">
+              Sudah punya akun?{" "}
+              <Link
+                to="/login"
+                className="text-blue-600 font-semibold hover:text-blue-800 transition-colors"
+              >
+                Masuk di sini
+              </Link>
+            </p>
+            <p className="mt-4 text-sm text-gray-500">
+              Dengan mendaftar, Anda mendapatkan akses ke semua fitur MindFlow untuk mengelola alur kerja dan produktivitas Anda.
+            </p>
+          </div>
+        </div>
+
+        {/* Back to Home */}
+        <div className="mt-8 text-center">
+          <Link
+            to="/"
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
           >
-            Login
-          </span>
-        </p>
-      </form>
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Kembali ke halaman utama
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
