@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import Todo from "./pages/Todo";
 import LandingPage from "./pages/Landing";
 
 const ProtectedRoute = ({ children }) => {
@@ -23,15 +22,6 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/todos"
-          element={
-            <ProtectedRoute>
-              <Todo />
             </ProtectedRoute>
           }
         />
