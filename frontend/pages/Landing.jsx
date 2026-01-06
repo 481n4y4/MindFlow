@@ -46,7 +46,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white">
       {/* Header/Navigation - PERBAIKAN DI SINI */}
       <header
         className={`fixed w-full z-50 transition-all duration-300 ${
@@ -183,8 +183,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      {/* ... (bagian hero section tetap sama) ... */}
-      <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-blue-50 to-white">
+      <section className="h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white ">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col lg:flex-row items-center">
             {/* Hero Content */}
