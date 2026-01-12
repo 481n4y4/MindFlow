@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -12,15 +12,13 @@ export default function LandingPage() {
     };
     window.addEventListener("scroll", handleScroll);
     
-    // Set initial state untuk mobile
     if (window.innerWidth < 768) {
-      setIsScrolled(true); // Selalu solid untuk mobile
+      setIsScrolled(true);
     }
     
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Fungsi untuk handle navigasi
   const handleLogin = () => {
     navigate("/login");
   };
@@ -34,23 +32,11 @@ export default function LandingPage() {
     setIsMenuOpen(false);
   };
 
-  // Tentukan kelas navbar berdasarkan kondisi
-  const getNavbarClass = () => {
-    if (window.innerWidth < 768) {
-      // Untuk mobile, selalu bg-white dengan shadow
-      return "bg-white shadow-md";
-    } else {
-      // Untuk desktop, tergantung scroll
-      return isScrolled ? "bg-white shadow-md" : "bg-transparent";
-    }
-  };
-
   return (
     <div className="bg-white">
-      {/* Header/Navigation - PERBAIKAN DI SINI */}
+      {/* Header/Navigation */}
       <header
         className={`fixed w-full z-50 transition-all duration-300 ${
-          // Untuk mobile: selalu solid, untuk desktop: tergantung scroll
           window.innerWidth < 768 ? "bg-white shadow-md" : 
           (isScrolled ? "bg-white shadow-md" : "bg-transparent")
         }`}
@@ -182,73 +168,141 @@ export default function LandingPage() {
         </nav>
       </header>
 
-      {/* Hero Section */}
-      <section className="h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white ">
+      {/* Hero Section - DIPERBAIKI untuk MindFlow */}
+      <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-blue-50 to-white">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col lg:flex-row items-center">
             {/* Hero Content */}
             <div className="lg:w-1/2 mb-12 lg:mb-0">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
-                Kelola <span className="text-blue-600">Alur Kerja</span> dan Ide
-                Anda dengan Lebih Terstruktur
+              {/* Badge */}
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-700 font-medium text-sm mb-6">
+                ✨ Aplikasi Manajemen Workflow Modern
+              </div>
+              
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
+                Kelola <span className="text-blue-600">Alur Kerja</span> dan Ide Anda dengan Lebih Terstruktur
               </h1>
-              <p className="text-gray-600 text-lg mb-8">
-                MindFlow adalah aplikasi berbasis web yang membantu Anda
-                mengelola alur kerja, ide, dan data secara terstruktur dengan
-                fitur autentikasi JWT dan REST API yang lengkap.
+              
+              <p className="text-gray-600 text-lg md:text-xl mb-10 max-w-2xl">
+                MindFlow adalah aplikasi berbasis web yang membantu Anda mengelola alur kerja, ide, dan data secara terstruktur dengan fitur autentikasi JWT dan REST API yang lengkap.
               </p>
-              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+              
+              {/* Stats Container */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                  <div className="text-3xl font-bold text-blue-600 mb-2">100%</div>
+                  <div className="text-sm text-gray-500">Keamanan data</div>
+                  <div className="text-lg font-semibold text-gray-900">JWT Auth</div>
+                </div>
+                
+                <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                  <div className="text-3xl font-bold text-blue-600 mb-2">⚡</div>
+                  <div className="text-sm text-gray-500">Operasi lengkap</div>
+                  <div className="text-lg font-semibold text-gray-900">CRUD API</div>
+                </div>
+                
+                <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                  <div className="text-3xl font-bold text-blue-600 mb-2">🎨</div>
+                  <div className="text-sm text-gray-500">Tampilan modern</div>
+                  <div className="text-lg font-semibold text-gray-900">Tailwind CSS</div>
+                </div>
+                
+                <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                  <div className="text-3xl font-bold text-blue-600 mb-2">5.0</div>
+                  <div className="text-sm text-gray-500">Rating pengguna</div>
+                  <div className="text-lg font-semibold text-gray-900">Ulasan</div>
+                </div>
+              </div>
+              
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row items-center gap-4">
                 <button
                   onClick={handleRegister}
-                  className="px-8 py-3.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition text-center shadow-lg cursor-pointer"
+                  className="px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition text-lg shadow-lg flex items-center justify-center cursor-pointer w-full sm:w-auto"
                 >
-                  Mulai Sekarang - Gratis
+                  <span className="mr-2">🚀</span> Mulai Sekarang - Gratis
                 </button>
-                <a
-                  href="#features"
-                  className="px-8 py-3.5 border-2 border-gray-300 text-gray-700 font-medium rounded-lg hover:border-blue-600 hover:text-blue-600 transition text-center"
-                >
-                  Pelajari Fitur
-                </a>
+                
+                <div className="flex items-center">
+                  <div className="flex text-yellow-400 mr-2">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="text-gray-700 font-medium">5.0 dari 80+ ulasan</span>
+                </div>
               </div>
             </div>
 
             {/* Hero Image/Visual */}
-            <div className="lg:w-1/2 flex justify-center">
+            <div className="lg:w-1/2 flex justify-center mt-12 lg:mt-0">
               <div className="relative w-full max-w-lg">
-                <div className="absolute -top-6 -left-6 w-64 h-64 bg-blue-100 rounded-3xl"></div>
-                <div className="relative bg-white rounded-2xl shadow-2xl p-6 border border-gray-200">
-                  <div className="flex items-center mb-6">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 mr-3"></div>
-                    <div>
-                      <div className="h-3 w-32 bg-gray-900 rounded mb-1"></div>
-                      <div className="h-2 w-24 bg-gray-400 rounded"></div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 mb-6">
+                {/* Background decorative elements */}
+                <div className="absolute -top-6 -right-6 w-72 h-72 bg-blue-100 rounded-full opacity-50"></div>
+                <div className="absolute -bottom-6 -left-6 w-64 h-64 bg-gradient-to-r from-blue-200 to-blue-100 rounded-3xl opacity-70"></div>
+                
+                {/* Main card */}
+                <div className="relative bg-white rounded-3xl shadow-2xl p-8 border border-gray-200">
+                  <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-green-500 mr-3"></div>
-                      <div className="h-3 w-48 bg-gray-200 rounded"></div>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-blue-500 mr-3"></div>
-                      <div className="h-3 w-40 bg-gray-300 rounded"></div>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-purple-500 mr-3"></div>
-                      <div className="h-3 w-44 bg-gray-200 rounded"></div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-100 rounded-xl p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="h-3 w-24 bg-gray-900 rounded"></div>
-                      <div className="h-8 w-20 bg-blue-600 text-white text-xs flex items-center justify-center rounded-lg">
-                        CRUD Active
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-800 flex items-center justify-center mr-4">
+                        <span className="text-white font-bold text-xl">MF</span>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">MindFlow Dashboard</h3>
+                        <p className="text-gray-500">Workflow Management</p>
                       </div>
                     </div>
-                    <div className="h-2 w-full bg-gray-300 rounded"></div>
+                    <div className="px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                      Online
+                    </div>
+                  </div>
+
+                  {/* Stats inside card */}
+                  <div className="grid grid-cols-2 gap-6 mb-8">
+                    <div className="bg-blue-50 p-4 rounded-xl">
+                      <div className="text-2xl font-bold text-blue-600">15</div>
+                      <div className="text-gray-600">Workflow Aktif</div>
+                    </div>
+                    <div className="bg-green-50 p-4 rounded-xl">
+                      <div className="text-2xl font-bold text-green-600">98%</div>
+                      <div className="text-gray-600">Produktivitas</div>
+                    </div>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="mb-8">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-gray-700 font-medium">Progress Hari Ini</span>
+                      <span className="text-blue-600 font-bold">78%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className="bg-gradient-to-r from-blue-500 to-blue-700 h-3 rounded-full" style={{ width: '78%' }}></div>
+                    </div>
+                  </div>
+
+                  {/* Features list */}
+                  <div className="space-y-4">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center mr-3">
+                        <span className="text-blue-600">✓</span>
+                      </div>
+                      <span className="text-gray-700">Autentikasi JWT Aman</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center mr-3">
+                        <span className="text-green-600">✓</span>
+                      </div>
+                      <span className="text-gray-700">CRUD Operations</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center mr-3">
+                        <span className="text-purple-600">✓</span>
+                      </div>
+                      <span className="text-gray-700">RESTful API</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -257,95 +311,146 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - SESUAI DESKRIPSI */}
       <section id="features" className="py-20 px-6 bg-white">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
+            <div className="inline-block px-4 py-2 rounded-full bg-blue-100 text-blue-700 font-medium text-sm mb-4">
+              ✨ Fitur Utama MindFlow
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Fitur Utama MindFlow
+              Solusi Lengkap untuk Manajemen Workflow
             </h2>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Solusi lengkap untuk mengelola alur kerja dan meningkatkan produktivitas Anda.
+              Aplikasi berbasis web yang dirancang untuk membantu pengguna mengelola alur kerja, ide, dan data secara terstruktur
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature 1 - Keamanan Akun */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-shadow duration-300 group">
+            {/* Feature 1 - Autentikasi JWT */}
+            <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-300 group hover:-translate-y-1">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center mb-6 group-hover:from-blue-200 group-hover:to-blue-300 transition-all">
                 <span className="text-2xl">🔐</span>
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
-                Keamanan Akun
+                Autentikasi JWT
               </h3>
               <p className="text-gray-600">
-                MindFlow menyediakan sistem akun pribadi agar setiap pengguna dapat menyimpan dan mengelola data mereka dengan aman. Hanya pemilik akun yang dapat mengakses informasi miliknya.
+                Sistem register dan login pengguna dengan JSON Web Token untuk keamanan maksimal. Proteksi route menggunakan token untuk akses terbatas.
               </p>
             </div>
 
-            {/* Feature 2 - Pengelolaan Aktivitas & Catatan */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-shadow duration-300 group">
+            {/* Feature 2 - CRUD Operations */}
+            <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-300 group hover:-translate-y-1">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center mb-6 group-hover:from-green-200 group-hover:to-green-300 transition-all">
-                <span className="text-2xl">📝</span>
+                <span className="text-2xl">🗂️</span>
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
-                Pengelolaan Aktivitas & Catatan
+                CRUD Operations
               </h3>
               <p className="text-gray-600">
-                Pengguna dapat menambahkan, melihat, mengubah, dan menghapus aktivitas atau catatan sesuai kebutuhan. Semua data tersimpan rapi dan mudah diatur.
+                Manajemen data lengkap (Create, Read, Update, Delete) untuk task, catatan, dan workflow. Terhubung dengan database MongoDB.
               </p>
             </div>
 
-            {/* Feature 3 - Akses Mudah & Cepat */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-shadow duration-300 group">
+            {/* Feature 3 - Frontend Modern */}
+            <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-300 group hover:-translate-y-1">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center mb-6 group-hover:from-purple-200 group-hover:to-purple-300 transition-all">
-                <span className="text-2xl">🌐</span>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
-                Akses Mudah & Cepat
-              </h3>
-              <p className="text-gray-600">
-                MindFlow dapat digunakan melalui browser tanpa instalasi tambahan. Perubahan data akan langsung terlihat sehingga pengguna dapat bekerja dengan lebih efisien.
-              </p>
-            </div>
-
-            {/* Feature 4 - Tampilan Sederhana & Nyaman */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-shadow duration-300 group">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-100 to-yellow-200 flex items-center justify-center mb-6 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-all">
                 <span className="text-2xl">🎨</span>
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
-                Tampilan Sederhana & Nyaman
+                Frontend Modern
               </h3>
               <p className="text-gray-600">
-                Dirancang dengan tampilan yang bersih dan modern agar mudah dipahami oleh siapa saja, baik pengguna baru maupun yang sudah terbiasa.
+                Menggunakan Tailwind CSS untuk styling yang responsif dan bersih. UI yang intuitif dan mudah digunakan oleh semua pengguna.
               </p>
             </div>
 
-            {/* Feature 5 - Sinkronisasi Data */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-shadow duration-300 group">
+            {/* Feature 4 - RESTful API */}
+            <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-300 group hover:-translate-y-1">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-100 to-yellow-200 flex items-center justify-center mb-6 group-hover:from-yellow-200 group-hover:to-yellow-300 transition-all">
+                <span className="text-2xl">🌐</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">
+                RESTful API
+              </h3>
+              <p className="text-gray-600">
+                Backend terpisah dengan struktur API yang rapi dan scalable. Arsitektur yang memudahkan pengembangan dan maintenance.
+              </p>
+            </div>
+
+            {/* Feature 5 - Full Stack Development */}
+            <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-300 group hover:-translate-y-1">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center mb-6 group-hover:from-indigo-200 group-hover:to-indigo-300 transition-all">
-                <span className="text-2xl">🔄</span>
+                <span className="text-2xl">🚀</span>
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
-                Sinkronisasi Data
+                Full Stack Development
               </h3>
               <p className="text-gray-600">
-                Data pengguna akan selalu tersimpan dan dapat diakses kembali kapan saja setelah masuk ke akun, tanpa takut kehilangan informasi.
+                Proyek pembelajaran implementasi Full Stack Web Development dengan fokus pada authentication dan API development.
               </p>
             </div>
 
-            {/* Feature 6 - Membantu Fokus & Produktivitas */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-shadow duration-300 group">
+            {/* Feature 6 - Manajemen Workflow */}
+            <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-300 group hover:-translate-y-1">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-red-100 to-red-200 flex items-center justify-center mb-6 group-hover:from-red-200 group-hover:to-red-300 transition-all">
-                <span className="text-2xl">🎯</span>
+                <span className="text-2xl">📊</span>
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
-                Membantu Fokus & Produktivitas
+                Manajemen Workflow
               </h3>
               <p className="text-gray-600">
-                MindFlow membantu pengguna mengatur alur pikir dan pekerjaan agar lebih terstruktur, sehingga aktivitas dapat dijalankan dengan lebih tenang dan terarah.
+                Membantu pengguna mengatur alur pikir dan pekerjaan agar lebih terstruktur, meningkatkan fokus dan produktivitas.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Technology Stack Section */}
+      <section id="tech" className="py-20 px-6 bg-gray-50">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Teknologi yang Digunakan
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Dibangun dengan teknologi modern untuk performa, keamanan, dan skalabilitas terbaik
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+              <div className="w-16 h-16 rounded-xl bg-blue-100 flex items-center justify-center mb-6 mx-auto">
+                <span className="text-blue-600 text-2xl font-bold">R</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">React.js</h3>
+              <p className="text-gray-600 text-center">Library JavaScript untuk membangun user interface yang interaktif</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+              <div className="w-16 h-16 rounded-xl bg-green-100 flex items-center justify-center mb-6 mx-auto">
+                <span className="text-green-600 text-2xl font-bold">T</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">Tailwind CSS</h3>
+              <p className="text-gray-600 text-center">Framework CSS utility-first untuk pengembangan UI yang cepat</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+              <div className="w-16 h-16 rounded-xl bg-purple-100 flex items-center justify-center mb-6 mx-auto">
+                <span className="text-purple-600 text-2xl font-bold">J</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">JWT Auth</h3>
+              <p className="text-gray-600 text-center">Autentikasi aman menggunakan JSON Web Tokens untuk proteksi data</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+              <div className="w-16 h-16 rounded-xl bg-red-100 flex items-center justify-center mb-6 mx-auto">
+                <span className="text-red-600 text-2xl font-bold">API</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">REST API</h3>
+              <p className="text-gray-600 text-center">CRUD operations dengan desain RESTful API yang terstruktur</p>
             </div>
           </div>
         </div>
@@ -357,14 +462,17 @@ export default function LandingPage() {
         className="py-20 px-6 bg-gradient-to-r from-blue-600 to-blue-800"
       >
         <div className="container mx-auto max-w-4xl text-center">
+          <div className="inline-block px-4 py-2 rounded-full bg-white/20 text-white font-medium text-sm mb-6">
+            Full Stack Web Development Project
+          </div>
+          
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Siap Mengoptimalkan Alur Kerja Anda?
           </h2>
           <p className="text-blue-100 text-lg mb-10 max-w-2xl mx-auto">
-            MindFlow dikembangkan sebagai bagian dari pembelajaran dan
-            implementasi Full Stack Web Development. Bergabunglah sekarang untuk
-            mengelola ide dan data secara terstruktur.
+            MindFlow dikembangkan sebagai bagian dari pembelajaran dan implementasi Full Stack Web Development dengan fokus pada Authentication JWT & CRUD REST API.
           </p>
+          
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={handleRegister}
@@ -428,11 +536,3 @@ export default function LandingPage() {
     </div>
   );
 }
-
-// Component for Technology Item
-const TechItem = ({ name, color, textColor }) => (
-  <div className="flex items-center">
-    <div className={`w-3 h-3 rounded-full ${color} mr-3`}></div>
-    <span className={`font-medium ${textColor}`}>{name}</span>
-  </div>
-);
