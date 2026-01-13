@@ -10,6 +10,8 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all"); // all, active, completed
   const navigate = useNavigate();
 
   const logout = () => {
@@ -17,21 +19,18 @@ export default function Dashboard() {
     navigate("/");
   };
 
-  // START EDIT
   const startEdit = (todo) => {
     setEditingId(todo._id);
     setEditingTitle(todo.title);
-    setError(""); // Clear any previous errors
+    setError("");
   };
 
-  // CANCEL EDIT
   const cancelEdit = () => {
     setEditingId(null);
     setEditingTitle("");
     setError("");
   };
 
-  // GET todos
   const fetchTodos = async () => {
     setIsLoading(true);
     setError("");
@@ -50,7 +49,6 @@ export default function Dashboard() {
     }
   };
 
-  // UPDATE todo
   const updateTodo = async (id) => {
     if (!editingTitle.trim()) {
       setError("Judul todo tidak boleh kosong");
@@ -61,6 +59,8 @@ export default function Dashboard() {
       await api.put(`/todos/${id}`, { title: editingTitle });
       setEditingId(null);
       setEditingTitle("");
+      setSuccessMessage("Todo berhasil diperbarui!");
+      setTimeout(() => setSuccessMessage(""), 3000);
       fetchTodos();
     } catch (err) {
       console.error(err);
@@ -68,7 +68,6 @@ export default function Dashboard() {
     }
   };
 
-  // CREATE todo
   const addTodo = async (e) => {
     e.preventDefault();
     if (!title.trim()) return;
@@ -76,6 +75,8 @@ export default function Dashboard() {
     try {
       await api.post("/todos", { title });
       setTitle("");
+      setSuccessMessage("Todo berhasil ditambahkan!");
+      setTimeout(() => setSuccessMessage(""), 3000);
       fetchTodos();
     } catch (err) {
       console.error(err);
@@ -83,12 +84,13 @@ export default function Dashboard() {
     }
   };
 
-  // DELETE todo
   const deleteTodo = async (id) => {
     if (!window.confirm("Apakah Anda yakin ingin menghapus todo ini?")) return;
 
     try {
       await api.delete(`/todos/${id}`);
+      setSuccessMessage("Todo berhasil dihapus!");
+      setTimeout(() => setSuccessMessage(""), 3000);
       fetchTodos();
     } catch (err) {
       console.error(err);
@@ -96,10 +98,12 @@ export default function Dashboard() {
     }
   };
 
-  // MARK as complete
   const toggleComplete = async (id, currentStatus) => {
     try {
       await api.put(`/todos/${id}`, { completed: !currentStatus });
+      const statusText = !currentStatus ? "diselesaikan" : "dibuka kembali";
+      setSuccessMessage(`Todo berhasil ${statusText}!`);
+      setTimeout(() => setSuccessMessage(""), 3000);
       fetchTodos();
     } catch (err) {
       console.error(err);
@@ -107,99 +111,97 @@ export default function Dashboard() {
     }
   };
 
-  // Filter todos berdasarkan search
-  const filteredTodos = todos.filter((todo) =>
-    todo.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const getFilteredTodos = () => {
+    let filtered = todos.filter((todo) =>
+      todo.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (activeFilter === "active") {
+      filtered = filtered.filter((todo) => !todo.completed);
+    } else if (activeFilter === "completed") {
+      filtered = filtered.filter((todo) => todo.completed);
+    }
+
+    return filtered;
+  };
+
+  const clearCompleted = async () => {
+    if (!window.confirm("Hapus semua todo yang sudah selesai?")) return;
+    
+    const completedTodos = todos.filter(todo => todo.completed);
+    try {
+      await Promise.all(completedTodos.map(todo => api.delete(`/todos/${todo._id}`)));
+      setSuccessMessage("Semua todo selesai telah dihapus!");
+      setTimeout(() => setSuccessMessage(""), 3000);
+      fetchTodos();
+    } catch (err) {
+      console.error(err);
+      setError("Gagal menghapus todo selesai");
+    }
+  };
 
   useEffect(() => {
     fetchTodos();
   }, []);
 
+  const filteredTodos = getFilteredTodos();
+  const completedCount = todos.filter(todo => todo.completed).length;
+  const activeCount = todos.filter(todo => !todo.completed).length;
+
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 z-50">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-slate-200 shadow-sm">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 flex items-center justify-center mr-3">
-                <span className="text-white font-bold text-xl">MF</span>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Mind<span className="text-blue-600">Flow</span>
-                </h1>
-                <p className="text-sm text-gray-600">Dashboard</p>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-xl">MF</span>
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                    MindFlow
+                  </h1>
+                  <p className="text-xs text-slate-500">Dashboard</p>
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              {/* Search Bar */}
-              <div className="relative">
+            <div className="flex items-center space-x-4">
+              <div className="relative hidden md:block">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg
-                    className="h-5 w-5 text-gray-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
+                  <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
                 <input
                   type="text"
                   placeholder="Cari todo..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full md:w-64"
+                  className="pl-10 pr-4 py-2.5 w-64 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
 
-              {/* User Menu */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center space-x-2">
                 <button
                   onClick={() => navigate("/profile")}
-                  className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
+                  title="Profil"
                 >
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                  <span className="hidden md:inline">Profil</span>
                 </button>
                 <button
                   onClick={logout}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all shadow-sm"
+                  className="px-4 py-2.5 bg-gradient-to-r from-slate-100 to-slate-50 text-slate-700 rounded-xl hover:from-slate-200 hover:to-slate-100 transition-all shadow-sm border border-slate-200 flex items-center space-x-2"
                 >
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                    />
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
-                  <span className="hidden md:inline">Keluar</span>
+                  <span className="font-medium">Keluar</span>
                 </button>
               </div>
             </div>
@@ -208,224 +210,268 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 md:pt-24 pt-40 pb-8 flex-grow">
-        {/* Stats Cards */}
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-slate-900 mb-2">Selamat datang di Dashboard</h2>
+          <p className="text-slate-600">Kelola workflow dan produktivitas Anda dengan mudah</p>
+        </div>
+
+        {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+          <div className="bg-gradient-to-br from-white to-blue-50 rounded-2xl p-6 shadow-lg border border-blue-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Todo</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">
-                  {todos.length}
-                </p>
+                <p className="text-sm font-medium text-slate-600">Total Todo</p>
+                <p className="text-3xl font-bold text-slate-900 mt-1">{todos.length}</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-blue-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
+              </div>
+            </div>
+            <div className="mt-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-slate-600">Progress</span>
+                <span className="font-medium text-blue-600">
+                  {todos.length > 0 ? Math.round((completedCount / todos.length) * 100) : 0}%
+                </span>
+              </div>
+              <div className="h-2 bg-slate-200 rounded-full overflow-hidden mt-2">
+                <div 
+                  className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500"
+                  style={{ width: `${todos.length > 0 ? (completedCount / todos.length) * 100 : 0}%` }}
+                ></div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+          <div className="bg-gradient-to-br from-white to-green-50 rounded-2xl p-6 shadow-lg border border-green-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Selesai</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">
-                  {todos.filter((todo) => todo.completed).length}
-                </p>
+                <p className="text-sm font-medium text-slate-600">Selesai</p>
+                <p className="text-3xl font-bold text-slate-900 mt-1">{completedCount}</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-green-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
+                <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
+              </div>
+            </div>
+            <div className="mt-4">
+              <div className="flex items-center text-sm text-green-600">
+                <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                <span>Produktivitas tinggi</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+          <div className="bg-gradient-to-br from-white to-orange-50 rounded-2xl p-6 shadow-lg border border-orange-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Belum Selesai</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">
-                  {todos.filter((todo) => !todo.completed).length}
-                </p>
+                <p className="text-sm font-medium text-slate-600">Belum Selesai</p>
+                <p className="text-3xl font-bold text-slate-900 mt-1">{activeCount}</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-yellow-100 flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-yellow-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
+              </div>
+            </div>
+            <div className="mt-4">
+              <div className="flex items-center text-sm text-orange-600">
+                <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Perlu perhatian</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Todo Section */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        {/* Todo Management Section */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
           {/* Header */}
-          <div className="border-b border-gray-200 px-6 py-4">
-            <h2 className="text-xl font-bold text-gray-900">My Todo List</h2>
-            <p className="text-gray-600 mt-1">
-              Kelola aktivitas dan catatan Anda
-            </p>
+          <div className="px-6 py-5 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">Todo Manager</h2>
+                <p className="text-slate-600 mt-1">Kelola daftar tugas dan produktivitas Anda</p>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="relative md:hidden">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Cari..."
+                    className="pl-10 pr-4 py-2 w-full bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                {completedCount > 0 && (
+                  <button
+                    onClick={clearCompleted}
+                    className="px-4 py-2 text-sm bg-gradient-to-r from-slate-100 to-slate-50 text-slate-700 rounded-lg hover:from-slate-200 hover:to-slate-100 transition-all border border-slate-200"
+                  >
+                    Hapus Selesai
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="mx-6 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm font-medium">{error}</p>
-            </div>
-          )}
+          {/* Messages */}
+          <div className="px-6 pt-4">
+            {error && (
+              <div className="mb-4 p-3 bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-xl">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-red-700 font-medium">{error}</span>
+                </div>
+              </div>
+            )}
+            
+            {successMessage && (
+              <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-xl animate-fade-in">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-green-700 font-medium">{successMessage}</span>
+                </div>
+              </div>
+            )}
+          </div>
 
-          {/* Add Todo Form */}
-          <div className="p-6 border-b border-gray-200">
-            <form
-              onSubmit={addTodo}
-              className="flex flex-col sm:flex-row gap-3"
-            >
+          {/* Quick Add Form */}
+          <div className="px-6 py-4 border-b border-slate-200 bg-blue-50/50">
+            <form onSubmit={addTodo} className="flex gap-3">
               <div className="flex-1">
-                <input
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="Apa yang ingin Anda kerjakan?"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  disabled={isLoading}
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Tambahkan todo baru..."
+                    className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-blue-100 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    disabled={isLoading}
+                  />
+                </div>
               </div>
               <button
                 type="submit"
                 disabled={!title.trim() || isLoading}
-                className={`px-6 py-3 rounded-lg font-medium text-white shadow transition-all ${
+                className={`px-6 py-3.5 rounded-xl font-semibold text-white shadow-lg transition-all transform hover:scale-[1.02] ${
                   !title.trim() || isLoading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 hover:shadow-md"
+                    ? "bg-slate-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-blue-200"
                 }`}
               >
-                {isLoading ? "Menambahkan..." : "Tambah Todo"}
+                {isLoading ? "..." : "Tambah"}
               </button>
             </form>
+          </div>
+
+          {/* Filter Tabs */}
+          <div className="px-6 py-3 border-b border-slate-200 bg-slate-50">
+            <div className="flex space-x-4">
+              {[
+                { id: "all", label: "Semua", count: todos.length },
+                { id: "active", label: "Aktif", count: activeCount },
+                { id: "completed", label: "Selesai", count: completedCount }
+              ].map((filter) => (
+                <button
+                  key={filter.id}
+                  onClick={() => setActiveFilter(filter.id)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                    activeFilter === filter.id
+                      ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md"
+                      : "text-slate-600 hover:text-blue-600 hover:bg-slate-100"
+                  }`}
+                >
+                  {filter.label}
+                  <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
+                    activeFilter === filter.id 
+                      ? "bg-white/30" 
+                      : "bg-slate-200"
+                  }`}>
+                    {filter.count}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Todo List */}
           <div className="p-6">
             {isLoading ? (
-              <div className="flex justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                <p className="text-slate-600 font-medium">Memuat todos...</p>
               </div>
             ) : filteredTodos.length === 0 ? (
               <div className="text-center py-12">
-                {searchTerm ? (
-                  <>
-                    <svg
-                      className="mx-auto h-12 w-12 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
+                <div className="w-24 h-24 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl">
+                  {searchTerm ? (
+                    <svg className="w-12 h-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <h3 className="mt-2 text-lg font-medium text-gray-900">
-                      Todo tidak ditemukan
-                    </h3>
-                    <p className="mt-1 text-gray-500">
-                      Tidak ada todo yang cocok dengan pencarian "{searchTerm}"
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      className="mx-auto h-12 w-12 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                      />
+                  ) : (
+                    <svg className="w-12 h-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
-                    <h3 className="mt-2 text-lg font-medium text-gray-900">
-                      Belum ada todo
-                    </h3>
-                    <p className="mt-1 text-gray-500">
-                      Mulai dengan menambahkan todo pertama Anda!
-                    </p>
-                  </>
-                )}
+                  )}
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                  {searchTerm ? "Todo tidak ditemukan" : "Belum ada todo"}
+                </h3>
+                <p className="text-slate-600 max-w-md mx-auto">
+                  {searchTerm 
+                    ? `Tidak ada todo yang cocok dengan "${searchTerm}". Coba kata kunci lain.`
+                    : "Mulai dengan menambahkan todo pertama Anda di atas!"}
+                </p>
               </div>
             ) : (
               <div className="space-y-3">
                 {filteredTodos.map((todo) => (
                   <div
                     key={todo._id}
-                    className={`flex items-center justify-between p-4 rounded-lg border transition-all hover:shadow-sm ${
+                    className={`group relative rounded-xl p-4 border transition-all duration-300 hover:shadow-md ${
                       todo.completed
-                        ? "bg-green-50 border-green-200"
-                        : "bg-white border-gray-200"
+                        ? "bg-gradient-to-r from-green-50/80 to-green-100/50 border-green-200"
+                        : "bg-white border-slate-200 hover:border-blue-300"
                     }`}
                   >
-                    {/* EDIT MODE */}
                     {editingId === todo._id ? (
-                      <div className="flex items-center gap-4 flex-1">
+                      /* Edit Mode */
+                      <div className="flex items-center gap-4">
                         <button
                           onClick={() => toggleComplete(todo._id, todo.completed)}
-                          className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${
+                          className={`flex-shrink-0 w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all ${
                             todo.completed
-                              ? "bg-green-500 border-green-500"
-                              : "border-gray-300 hover:border-green-500"
+                              ? "bg-gradient-to-br from-green-500 to-green-600 border-green-600"
+                              : "border-slate-300 hover:border-green-500"
                           }`}
                           disabled
                         >
                           {todo.completed && (
-                            <svg
-                              className="w-4 h-4 text-white"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 13l4 4L19 7"
-                              />
+                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                           )}
                         </button>
@@ -434,116 +480,99 @@ export default function Dashboard() {
                             type="text"
                             value={editingTitle}
                             onChange={(e) => setEditingTitle(e.target.value)}
-                            className="w-full px-3 py-2 border border-blue-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2.5 bg-white border-2 border-blue-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
                             autoFocus
                             onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                updateTodo(todo._id);
-                              }
-                              if (e.key === "Escape") {
-                                cancelEdit();
-                              }
+                              if (e.key === "Enter") updateTodo(todo._id);
+                              if (e.key === "Escape") cancelEdit();
                             }}
                           />
                         </div>
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => updateTodo(todo._id)}
-                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                            className="px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-sm"
                           >
                             Simpan
                           </button>
                           <button
                             onClick={cancelEdit}
-                            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                            className="px-4 py-2.5 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-lg hover:from-slate-700 hover:to-slate-800 transition-all shadow-sm"
                           >
                             Batal
                           </button>
                         </div>
                       </div>
                     ) : (
-                      /* VIEW MODE */
+                      /* View Mode */
                       <>
-                        <div className="flex items-center gap-4 flex-1">
+                        <div className="flex items-center gap-4">
                           <button
                             onClick={() => toggleComplete(todo._id, todo.completed)}
-                            className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${
+                            className={`flex-shrink-0 w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all hover:scale-110 ${
                               todo.completed
-                                ? "bg-green-500 border-green-500"
-                                : "border-gray-300 hover:border-green-500"
+                                ? "bg-gradient-to-br from-green-500 to-green-600 border-green-600"
+                                : "border-slate-300 hover:border-green-500"
                             }`}
                           >
                             {todo.completed && (
-                              <svg
-                                className="w-4 h-4 text-white"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M5 13l4 4L19 7"
-                                />
+                              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                               </svg>
                             )}
                           </button>
-                          <div className="flex-1">
+                          <div className="flex-1 min-w-0">
                             <p
-                              className={`font-medium ${
+                              className={`font-medium text-lg ${
                                 todo.completed
-                                  ? "text-green-700 line-through"
-                                  : "text-gray-900"
+                                  ? "text-green-800 line-through decoration-2"
+                                  : "text-slate-800"
                               }`}
                             >
                               {todo.title}
                             </p>
-                            <p className="text-sm text-gray-500">
-                              Dibuat:{" "}
-                              {new Date(todo.createdAt).toLocaleDateString("id-ID")}
-                            </p>
+                            <div className="flex items-center gap-3 mt-1">
+                              <span className="text-xs text-slate-500 flex items-center">
+                                <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {new Date(todo.createdAt).toLocaleDateString("id-ID", {
+                                  weekday: 'long',
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric'
+                                })}
+                              </span>
+                              {todo.updatedAt !== todo.createdAt && (
+                                <span className="text-xs text-blue-500 flex items-center">
+                                  <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                  </svg>
+                                  Diperbarui
+                                </span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => startEdit(todo)}
-                            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Edit"
-                          >
-                            <svg
-                              className="w-5 h-5"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => startEdit(todo)}
+                              className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              title="Edit"
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                              />
-                            </svg>
-                          </button>
-                          <button
-                            onClick={() => deleteTodo(todo._id)}
-                            className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Hapus"
-                          >
-                            <svg
-                              className="w-5 h-5"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
+                              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => deleteTodo(todo._id)}
+                              className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Hapus"
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              />
-                            </svg>
-                          </button>
+                              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       </>
                     )}
@@ -551,69 +580,83 @@ export default function Dashboard() {
                 ))}
               </div>
             )}
-          </div>
 
-          {/* Footer Stats */}
-          {!isLoading && filteredTodos.length > 0 && (
-            <div className="border-t border-gray-200 px-6 py-4 bg-gray-50">
-              <div className="flex justify-between items-center text-sm text-gray-600">
-                <span>
-                  Menampilkan{" "}
-                  <span className="font-medium">{filteredTodos.length}</span>{" "}
-                  dari <span className="font-medium">{todos.length}</span> todo
-                </span>
-                <div className="flex items-center gap-4">
-                  <span className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    <span>
-                      Selesai: {todos.filter((todo) => todo.completed).length}
-                    </span>
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    <span>
-                      Belum: {todos.filter((todo) => !todo.completed).length}
-                    </span>
-                  </span>
+            {/* Summary */}
+            {!isLoading && filteredTodos.length > 0 && (
+              <div className="mt-6 pt-4 border-t border-slate-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center space-x-6">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 rounded-full bg-gradient-to-r from-green-500 to-green-600"></div>
+                      <span className="text-sm text-slate-600">
+                        Selesai: <span className="font-semibold">{completedCount}</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 rounded-full bg-gradient-to-r from-orange-500 to-orange-600"></div>
+                      <span className="text-sm text-slate-600">
+                        Aktif: <span className="font-semibold">{activeCount}</span>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-sm text-slate-600">
+                    Menampilkan <span className="font-semibold">{filteredTodos.length}</span> dari{' '}
+                    <span className="font-semibold">{todos.length}</span> todo
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-gray-200 bg-white py-6 flex-shrink-0">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <p className="text-gray-600">
-                © {new Date().getFullYear()} MindFlow. All rights reserved.
-              </p>
+      <footer className="mt-12 pt-8 border-t border-slate-200">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center py-6">
+            <div className="mb-6 md:mb-0">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 flex items-center justify-center">
+                  <span className="text-white font-bold">MF</span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900">MindFlow Dashboard</h3>
+                  <p className="text-sm text-slate-600">Streamline your workflow</p>
+                </div>
+              </div>
             </div>
-            <div className="flex gap-6">
-              <a
-                href="#"
-                className="text-gray-600 hover:text-blue-600 transition-colors"
-              >
+            <div className="flex flex-wrap gap-6">
+              <a href="#" className="text-slate-600 hover:text-blue-600 transition-colors text-sm">
                 Bantuan
               </a>
-              <a
-                href="#"
-                className="text-gray-600 hover:text-blue-600 transition-colors"
-              >
+              <a href="#" className="text-slate-600 hover:text-blue-600 transition-colors text-sm">
                 Kebijakan Privasi
               </a>
-              <a
-                href="#"
-                className="text-gray-600 hover:text-blue-600 transition-colors"
-              >
+              <a href="#" className="text-slate-600 hover:text-blue-600 transition-colors text-sm">
                 Syarat Layanan
+              </a>
+              <a href="#" className="text-slate-600 hover:text-blue-600 transition-colors text-sm">
+                Kontak
               </a>
             </div>
           </div>
+          <div className="text-center py-6 border-t border-slate-200">
+            <p className="text-sm text-slate-500">
+              © {new Date().getFullYear()} MindFlow. Dibangun dengan ❤️ untuk produktivitas yang lebih baik.
+            </p>
+          </div>
         </div>
       </footer>
+
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
