@@ -4,19 +4,25 @@ import {
   getTodos,
   updateTodo,
   deleteTodo,
+  addSubTask,
+  toggleSubTask,
+  deleteSubTask,
 } from "../controllers/todoController.js";
 import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.use(protect); // semua route di bawah ini wajib login
+router.use(protect);
 
-router.route("/")
-  .post(createTodo)
-  .get(getTodos);
+router.post("/", protect, createTodo);
+router.get("/", protect, getTodos);
+router.put("/:id", protect, updateTodo);
+router.delete("/:id", protect, deleteTodo);
 
-router.route("/:id")
-  .put(updateTodo)
-  .delete(deleteTodo);
+// Subtasks
+router.post("/:todoId/subtasks", protect, addSubTask);
+router.put("/:todoId/subtasks/:subTaskId", protect, toggleSubTask);
+router.delete("/:todoId/subtasks/:subTaskId", protect, deleteSubTask);
+
 
 export default router;

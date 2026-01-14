@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import LandingPage from "./pages/Landing";
+import AddTodoList from "./pages/AddTodoList";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -22,6 +23,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/addTodoList"
+          element={
+            <ProtectedRoute>
+              <AddTodoList />
             </ProtectedRoute>
           }
         />
