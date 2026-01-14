@@ -1,6 +1,32 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faSearch, 
+  faUser, 
+  faSignOutAlt,
+  faPlus,
+  faEdit,
+  faTrash,
+  faClock,
+  faCheck,
+  faTimes,
+  faCheckCircle,
+  faTimesCircle,
+  faExclamationCircle,
+  faListCheck,
+  faCircleCheck,
+  faHourglassHalf,
+  faChartLine,
+  faArrowTrendUp,
+  faExclamationTriangle,
+  faFilter,
+  faXmark,
+  faSpinner,
+  faLayerGroup,
+  faEllipsisVertical
+} from '@fortawesome/free-solid-svg-icons';
 
 export default function Dashboard() {
   const [todos, setTodos] = useState([]);
@@ -157,7 +183,7 @@ export default function Dashboard() {
             <div className="flex items-center">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-xl">MF</span>
+                  <FontAwesomeIcon icon={faLayerGroup} className="text-white text-lg" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
@@ -171,9 +197,7 @@ export default function Dashboard() {
             <div className="flex items-center space-x-4">
               <div className="relative hidden md:block">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
+                  <FontAwesomeIcon icon={faSearch} className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
                   type="text"
@@ -190,17 +214,13 @@ export default function Dashboard() {
                   className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
                   title="Profil"
                 >
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                  <FontAwesomeIcon icon={faUser} className="h-6 w-6" />
                 </button>
                 <button
                   onClick={logout}
                   className="px-4 py-2.5 bg-gradient-to-r from-slate-100 to-slate-50 text-slate-700 rounded-xl hover:from-slate-200 hover:to-slate-100 transition-all shadow-sm border border-slate-200 flex items-center space-x-2"
                 >
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
+                  <FontAwesomeIcon icon={faSignOutAlt} className="h-5 w-5" />
                   <span className="font-medium">Keluar</span>
                 </button>
               </div>
@@ -226,9 +246,7 @@ export default function Dashboard() {
                 <p className="text-3xl font-bold text-slate-900 mt-1">{todos.length}</p>
               </div>
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
+                <FontAwesomeIcon icon={faListCheck} className="w-7 h-7 text-white" />
               </div>
             </div>
             <div className="mt-4">
@@ -254,16 +272,12 @@ export default function Dashboard() {
                 <p className="text-3xl font-bold text-slate-900 mt-1">{completedCount}</p>
               </div>
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
-                <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <FontAwesomeIcon icon={faCircleCheck} className="w-7 h-7 text-white" />
               </div>
             </div>
             <div className="mt-4">
               <div className="flex items-center text-sm text-green-600">
-                <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
+                <FontAwesomeIcon icon={faArrowTrendUp} className="w-4 h-4 mr-1" />
                 <span>Produktivitas tinggi</span>
               </div>
             </div>
@@ -276,16 +290,12 @@ export default function Dashboard() {
                 <p className="text-3xl font-bold text-slate-900 mt-1">{activeCount}</p>
               </div>
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
-                <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <FontAwesomeIcon icon={faHourglassHalf} className="w-7 h-7 text-white" />
               </div>
             </div>
             <div className="mt-4">
               <div className="flex items-center text-sm text-orange-600">
-                <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <FontAwesomeIcon icon={faExclamationTriangle} className="w-4 h-4 mr-1" />
                 <span>Perlu perhatian</span>
               </div>
             </div>
@@ -304,9 +314,7 @@ export default function Dashboard() {
               <div className="flex items-center space-x-4">
                 <div className="relative md:hidden">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                    <FontAwesomeIcon icon={faSearch} className="h-5 w-5 text-slate-400" />
                   </div>
                   <input
                     type="text"
@@ -319,8 +327,9 @@ export default function Dashboard() {
                 {completedCount > 0 && (
                   <button
                     onClick={clearCompleted}
-                    className="px-4 py-2 text-sm bg-gradient-to-r from-slate-100 to-slate-50 text-slate-700 rounded-lg hover:from-slate-200 hover:to-slate-100 transition-all border border-slate-200"
+                    className="px-4 py-2 text-sm bg-gradient-to-r from-slate-100 to-slate-50 text-slate-700 rounded-lg hover:from-slate-200 hover:to-slate-100 transition-all border border-slate-200 flex items-center gap-2"
                   >
+                    <FontAwesomeIcon icon={faTrash} className="w-3 h-3" />
                     Hapus Selesai
                   </button>
                 )}
@@ -333,9 +342,7 @@ export default function Dashboard() {
             {error && (
               <div className="mb-4 p-3 bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-xl">
                 <div className="flex items-center">
-                  <svg className="w-5 h-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <FontAwesomeIcon icon={faExclamationCircle} className="w-5 h-5 text-red-500 mr-2" />
                   <span className="text-red-700 font-medium">{error}</span>
                 </div>
               </div>
@@ -344,9 +351,7 @@ export default function Dashboard() {
             {successMessage && (
               <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-xl animate-fade-in">
                 <div className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <FontAwesomeIcon icon={faCheckCircle} className="w-5 h-5 text-green-500 mr-2" />
                   <span className="text-green-700 font-medium">{successMessage}</span>
                 </div>
               </div>
@@ -359,9 +364,7 @@ export default function Dashboard() {
               <div className="flex-1">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
+                    <FontAwesomeIcon icon={faPlus} className="h-5 w-5 text-blue-500" />
                   </div>
                   <input
                     type="text"
@@ -382,7 +385,7 @@ export default function Dashboard() {
                     : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-blue-200"
                 }`}
               >
-                {isLoading ? "..." : "Tambah"}
+                {isLoading ? <FontAwesomeIcon icon={faSpinner} className="animate-spin" /> : "Tambah"}
               </button>
             </form>
           </div>
@@ -398,14 +401,18 @@ export default function Dashboard() {
                 <button
                   key={filter.id}
                   onClick={() => setActiveFilter(filter.id)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
                     activeFilter === filter.id
                       ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md"
                       : "text-slate-600 hover:text-blue-600 hover:bg-slate-100"
                   }`}
                 >
+                  <FontAwesomeIcon 
+                    icon={filter.id === "all" ? faFilter : filter.id === "active" ? faHourglassHalf : faCircleCheck} 
+                    className="w-4 h-4"
+                  />
                   {filter.label}
-                  <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
+                  <span className={`text-xs px-1.5 py-0.5 rounded-full ${
                     activeFilter === filter.id 
                       ? "bg-white/30" 
                       : "bg-slate-200"
@@ -428,13 +435,9 @@ export default function Dashboard() {
               <div className="text-center py-12">
                 <div className="w-24 h-24 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl">
                   {searchTerm ? (
-                    <svg className="w-12 h-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <FontAwesomeIcon icon={faTimesCircle} className="w-12 h-12 text-slate-400" />
                   ) : (
-                    <svg className="w-12 h-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
+                    <FontAwesomeIcon icon={faListCheck} className="w-12 h-12 text-slate-400" />
                   )}
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">
@@ -470,9 +473,7 @@ export default function Dashboard() {
                           disabled
                         >
                           {todo.completed && (
-                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
+                            <FontAwesomeIcon icon={faCheck} className="w-4 h-4 text-white" />
                           )}
                         </button>
                         <div className="flex-1">
@@ -491,14 +492,16 @@ export default function Dashboard() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => updateTodo(todo._id)}
-                            className="px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-sm"
+                            className="px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-sm flex items-center gap-2"
                           >
+                            <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
                             Simpan
                           </button>
                           <button
                             onClick={cancelEdit}
-                            className="px-4 py-2.5 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-lg hover:from-slate-700 hover:to-slate-800 transition-all shadow-sm"
+                            className="px-4 py-2.5 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-lg hover:from-slate-700 hover:to-slate-800 transition-all shadow-sm flex items-center gap-2"
                           >
+                            <FontAwesomeIcon icon={faTimes} className="w-4 h-4" />
                             Batal
                           </button>
                         </div>
@@ -516,9 +519,7 @@ export default function Dashboard() {
                             }`}
                           >
                             {todo.completed && (
-                              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                              </svg>
+                              <FontAwesomeIcon icon={faCheck} className="w-4 h-4 text-white" />
                             )}
                           </button>
                           <div className="flex-1 min-w-0">
@@ -533,9 +534,7 @@ export default function Dashboard() {
                             </p>
                             <div className="flex items-center gap-3 mt-1">
                               <span className="text-xs text-slate-500 flex items-center">
-                                <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                                <FontAwesomeIcon icon={faClock} className="w-3 h-3 mr-1" />
                                 {new Date(todo.createdAt).toLocaleDateString("id-ID", {
                                   weekday: 'long',
                                   year: 'numeric',
@@ -545,9 +544,7 @@ export default function Dashboard() {
                               </span>
                               {todo.updatedAt !== todo.createdAt && (
                                 <span className="text-xs text-blue-500 flex items-center">
-                                  <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                  </svg>
+                                  <FontAwesomeIcon icon={faEdit} className="w-3 h-3 mr-1" />
                                   Diperbarui
                                 </span>
                               )}
@@ -559,18 +556,14 @@ export default function Dashboard() {
                               className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                               title="Edit"
                             >
-                              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
+                              <FontAwesomeIcon icon={faEdit} className="w-5 h-5" />
                             </button>
                             <button
                               onClick={() => deleteTodo(todo._id)}
                               className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                               title="Hapus"
                             >
-                              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
+                              <FontAwesomeIcon icon={faTrash} className="w-5 h-5" />
                             </button>
                           </div>
                         </div>
@@ -617,7 +610,7 @@ export default function Dashboard() {
             <div className="mb-6 md:mb-0">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 flex items-center justify-center">
-                  <span className="text-white font-bold">MF</span>
+                  <FontAwesomeIcon icon={faLayerGroup} className="text-white text-sm" />
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900">MindFlow Dashboard</h3>
