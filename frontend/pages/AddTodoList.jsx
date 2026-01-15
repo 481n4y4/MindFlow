@@ -13,65 +13,18 @@ import {
 
 export default function AddTodoList() {
   const [todos, setTodos] = useState([]);
+
   const [title, setTitle] = useState("");
+  const [desc, setDecs] = useState("");
   const [deadline, setDeadline] = useState("");
+  const [subtasks, setSubtasks] = useState([]);
+  const [subtaskInput, setSubtaskInput] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [editingTitle, setEditingTitle] = useState("");
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all"); // all, active, completed
   const navigate = useNavigate();
-
-  const startEdit = (todo) => {
-    setEditingId(todo._id);
-    setEditingTitle(todo.title);
-    setError("");
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditingTitle("");
-    setError("");
-  };
-
-  const fetchTodos = async () => {
-    setIsLoading(true);
-    setError("");
-    try {
-      const res = await api.get("/todos");
-      setTodos(res.data);
-    } catch (err) {
-      console.error(err);
-      setError("Gagal memuat data todos");
-      if (err.response?.status === 401) {
-        localStorage.removeItem("token");
-        navigate("/login");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateTodo = async (id) => {
-    if (!editingTitle.trim()) {
-      setError("Judul todo tidak boleh kosong");
-      return;
-    }
-
-    try {
-      await api.put(`/todos/${id}`, { title: editingTitle });
-      setEditingId(null);
-      setEditingTitle("");
-      setSuccessMessage("Todo berhasil diperbarui!");
-      setTimeout(() => setSuccessMessage(""), 3000);
-      fetchTodos();
-    } catch (err) {
-      console.error(err);
-      setError("Gagal mengupdate todo");
-    }
-  };
 
   const addTodo = async (e) => {
     e.preventDefault();
@@ -85,14 +38,18 @@ export default function AddTodoList() {
       const res = await api.post("/todos", {
         title,
         deadline: deadline || undefined,
+        desc,
+        subtasks,
       });
 
       setTodos((prev) => [res.data, ...prev]);
       setTitle("");
       setDeadline("");
+      setDecs("");
+      setSubtasks([]);
       setSuccessMessage("Todo berhasil ditambahkan!");
       setTimeout(() => setSuccessMessage(""), 3000);
-      navigate('/dashboard')
+      navigate("/dashboard");
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Gagal menambah todo");
@@ -106,8 +63,19 @@ export default function AddTodoList() {
     }
   };
 
+  const addSubtask = () => {
+    if (!subtaskInput.trim()) return;
+
+    setSubtasks([...subtasks, { text: subtaskInput, done: false }]);
+    setSubtaskInput("");
+  };
+
+  const removeSubtask = (index) => {
+    setSubtasks(subtasks.filter((_, i) => i !== index));
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-blue-50">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-slate-200 shadow-sm">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -200,7 +168,7 @@ export default function AddTodoList() {
             )}
           </div>
 
-          {/* Quick Add Form */}
+          {/* Add Form */}
           <div className="px-6 py-4 border-b border-slate-200 bg-blue-50/50">
             <form onSubmit={addTodo} className="flex flex-col gap-3">
               {/* Title */}
@@ -224,7 +192,57 @@ export default function AddTodoList() {
                 onChange={(e) => setDeadline(e.target.value)}
                 disabled={isLoading}
               />
+              {/* Decs */}
+              <h3 className="text-base font-bold text-slate-900">Deskripsi</h3>
+              <textarea
+                type="text"
+                placeholder="Tambahkan deskripsi baru..."
+                className="w-full px-4 py-3.5 bg-white border-2 border-blue-100 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all"
+                value={desc}
+                onChange={(e) => setDecs(e.target.value)}
+                disabled={isLoading}
+              />
+              <h3 className="text-base font-bold text-slate-900">Subtask</h3>
 
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Tambahkan subtask..."
+                  className="flex-1 px-4 py-3 bg-white border-2 border-blue-100 rounded-xl focus:ring-2 focus:ring-blue-500"
+                  value={subtaskInput}
+                  onChange={(e) => setSubtaskInput(e.target.value)}
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  onClick={addSubtask}
+                  className="px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                >
+                  +
+                </button>
+              </div>
+
+              {subtasks.length > 0 && (
+                <ul className="mt-3 space-y-2">
+                  {subtasks.map((subtask, index) => (
+                    <li
+                      key={index}
+                      className="flex items-center justify-between px-4 py-2 bg-white border rounded-lg"
+                    >
+                      <span className="text-slate-700 text-sm">
+                        • {subtask.text}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeSubtask(index)}
+                        className="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        Hapus
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
               {/* Submit */}
               <button
                 type="submit"
